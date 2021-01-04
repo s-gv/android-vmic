@@ -38,12 +38,13 @@ class MainActivity : AppCompatActivity() {
         val sharedPref = getSharedPreferences(SHARED_PREFERENCES_FILE, MODE_PRIVATE)
         addr = sharedPref.getString("addr", DEFAULT_ADDR)!!
         port = sharedPref.getInt("port", DEFAULT_PORT)
-    }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        val inflater: MenuInflater = menuInflater
-        inflater.inflate(R.menu.main_menu, menu)
-        return true
+        if (savedInstanceState != null) {
+            addr = savedInstanceState.getString("addr", DEFAULT_ADDR)
+            port = savedInstanceState.getInt("port", DEFAULT_PORT)
+            isStreaming = MicStreamService.isStreaming
+            updateUI()
+        }
     }
 
     override fun onSaveInstanceState(savedInstanceState: Bundle) {
@@ -52,12 +53,10 @@ class MainActivity : AppCompatActivity() {
         savedInstanceState.putInt("port", port)
     }
 
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-        addr = savedInstanceState.getString("addr", DEFAULT_ADDR)
-        port = savedInstanceState.getInt("port", DEFAULT_PORT)
-        isStreaming = MicStreamService.isStreaming
-        updateUI()
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        val inflater: MenuInflater = menuInflater
+        inflater.inflate(R.menu.main_menu, menu)
+        return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
