@@ -42,9 +42,10 @@ class MainActivity : AppCompatActivity() {
         if (savedInstanceState != null) {
             addr = savedInstanceState.getString("addr", DEFAULT_ADDR)
             port = savedInstanceState.getInt("port", DEFAULT_PORT)
-            isStreaming = MicStreamService.isStreaming
-            updateUI()
         }
+
+        isStreaming = MicStreamService.isStreaming
+        updateUI()
     }
 
     override fun onSaveInstanceState(savedInstanceState: Bundle) {
