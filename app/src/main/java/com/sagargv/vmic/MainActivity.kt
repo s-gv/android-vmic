@@ -14,7 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.JobIntentService
 
 
-private const val LOG_TAG = "vMic"
+const val LOG_TAG = "LOG_vMic"
 private const val REQUEST_RECORD_AUDIO_PERMISSION = 200
 private const val SHARED_PREFERENCES_FILE = "com.sagargv.vmic.shared_prefs"
 

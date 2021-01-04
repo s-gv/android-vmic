@@ -19,7 +19,7 @@ class MicStreamService : JobIntentService() {
         val port = intent.getIntExtra("port", 9009)
         val addr = intent.getStringExtra("addr") ?: "192.168.1.2"
 
-        Log.e("TAG", "Start streaming -- " + addr + ":" + port)
+        Log.d(LOG_TAG, "Start streaming -- " + addr + ":" + port)
 
         val udpSocket = DatagramSocket()
         val serverAddr: InetAddress = InetAddress.getByName(addr)
@@ -32,6 +32,6 @@ class MicStreamService : JobIntentService() {
         udpSocket.disconnect()
         udpSocket.close()
 
-        Log.e("TAG", "stopped streaming")
+        Log.d(LOG_TAG, "stopped streaming")
     }
 }
