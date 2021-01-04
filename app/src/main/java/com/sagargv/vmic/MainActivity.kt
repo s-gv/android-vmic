@@ -49,18 +49,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun showIPDialog() {
-        val layout = LayoutInflater.from(this).inflate(R.layout.dialog_addr, null, false))
+        val layout = LayoutInflater.from(this).inflate(R.layout.dialog_addr, null, false)
+        layout.findViewById<EditText>(R.id.ip).setText(ip)
+        layout.findViewById<EditText>(R.id.port).setText(port.toString())
+
         val builder = AlertDialog.Builder(this)
-        builder.setMessage("MSG")
-        builder.setTitle("Title")
+        builder.setTitle("Set IP / port")
         builder.setView(layout)
         builder.apply {
             setPositiveButton(android.R.string.ok,
                     DialogInterface.OnClickListener { dialog, id ->
-                        ip = layout.findViewById<EditText>(R.id.ip).toString()
-                        port = layout.findViewById<EditText>(R.id.port).toString().toInt()
-
-                        Log.e("TAG", ip + ":" + port)
+                        ip = layout.findViewById<EditText>(R.id.ip).text.toString()
+                        port = layout.findViewById<EditText>(R.id.port).text.toString().toInt()
+                        //Log.i(LOG_TAG, ip + ":" + port)
                     })
             setNegativeButton(android.R.string.cancel,
                     DialogInterface.OnClickListener { dialog, id ->
@@ -89,7 +90,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun startStreaming() {
         val serviceIntent = Intent().apply {
-            putExtra("stream_addr", "192.168.29.236")
+            putExtra("addr", ip)
+            putExtra("port", port)
         }
         JobIntentService.enqueueWork(this, MicStreamService::class.java, 0, serviceIntent)
     }

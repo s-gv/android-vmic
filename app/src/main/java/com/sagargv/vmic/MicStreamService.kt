@@ -16,10 +16,14 @@ class MicStreamService : JobIntentService() {
 
     override fun onHandleWork(intent: Intent) {
         isStreaming = true
-        val port = 9009
+
+        val port = intent.getIntExtra("port", 9009)
+        val ip = intent.getStringExtra("addr") ?: "192.168.29.36"
+
+        Log.e("TAG", "Start streaming -- " + ip + ":" + port)
 
         val udpSocket = DatagramSocket()
-        val serverAddr: InetAddress = InetAddress.getByName("192.168.29.236")
+        val serverAddr: InetAddress = InetAddress.getByName(ip)
         val buf = "The String to Send".toByteArray()
         while (isStreaming) {
             val packet = DatagramPacket(buf, buf.size, serverAddr, port)
