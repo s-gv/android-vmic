@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
         else {
             isStreaming = false
             stopStreaming()
-            v.setBackgroundColor(resources.getColor(android.R.color.background_light))
+            v.setBackgroundColor(resources.getColor(android.R.color.darker_gray))
         }
     }
 
