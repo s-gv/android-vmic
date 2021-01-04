@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.*
 import android.widget.Button
@@ -11,6 +12,7 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.app.JobIntentService
 
 
@@ -85,34 +87,46 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onMicButtonClick(v: View) {
-        val b = v as Button
         if (!isStreaming) {
-            isStreaming = true
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if(checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO), REQUEST_RECORD_AUDIO_PERMISSION)
+                    return
+                }
+            }
             startStreaming()
-
-            b.setText("End streaming")
-            b.setBackgroundColor(resources.getColor(android.R.color.holo_red_light))
         }
         else {
-            isStreaming = false
             stopStreaming()
-            b.setText("Start mic streaming")
-            b.setBackgroundColor(resources.getColor(android.R.color.holo_green_light))
         }
     }
 
     private fun startStreaming() {
-        val statusView = findViewById<TextView>(R.id.statusView)
+        isStreaming = true
+
         val serviceIntent = Intent().apply {
             putExtra("addr", addr)
             putExtra("port", port)
         }
         JobIntentService.enqueueWork(this, MicStreamService::class.java, 0, serviceIntent)
+
+        val b = findViewById(R.id.button) as Button
+        b.setText("End streaming")
+        b.setBackgroundColor(resources.getColor(android.R.color.holo_red_light))
+
+        val statusView = findViewById<TextView>(R.id.statusView)
         statusView.setText("Streaming to " + addr + ":" + port)
     }
 
     private fun stopStreaming() {
+        isStreaming = false
+
         MicStreamService.isStreaming = false
+
+        val b = findViewById(R.id.button) as Button
+        b.setText("Start mic streaming")
+        b.setBackgroundColor(resources.getColor(android.R.color.holo_green_light))
+
         val statusView = findViewById<TextView>(R.id.statusView)
         statusView.setText("")
     }
@@ -128,6 +142,8 @@ class MainActivity : AppCompatActivity() {
         } else {
             false
         }
-        if (!permissionToRecordAccepted) finish()
+        if (permissionToRecordAccepted) {
+            startStreaming()
+        }
     }
 }
