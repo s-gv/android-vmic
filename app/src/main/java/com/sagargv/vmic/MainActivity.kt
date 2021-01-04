@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.widget.Button
 import androidx.core.app.JobIntentService
 
 private const val LOG_TAG = "vMic"
@@ -23,21 +24,24 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onMicButtonClick(v: View) {
+        val b = v as Button
         if (!isStreaming) {
             isStreaming = true
             startStreaming()
-            v.setBackgroundColor(resources.getColor(android.R.color.holo_red_light))
+            b.setText("End mic streaming")
+            b.setBackgroundColor(resources.getColor(android.R.color.holo_red_light))
         }
         else {
             isStreaming = false
             stopStreaming()
-            v.setBackgroundColor(resources.getColor(android.R.color.darker_gray))
+            b.setText("Start mic streaming")
+            b.setBackgroundColor(resources.getColor(android.R.color.holo_green_light))
         }
     }
 
     private fun startStreaming() {
         val serviceIntent = Intent().apply {
-            putExtra("stream_addr", "192.168.1.5")
+            putExtra("stream_addr", "192.168.29.236")
         }
         JobIntentService.enqueueWork(this, MicStreamService::class.java, 0, serviceIntent)
     }
