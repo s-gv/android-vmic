@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.*
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.JobIntentService
@@ -88,6 +89,7 @@ class MainActivity : AppCompatActivity() {
         if (!isStreaming) {
             isStreaming = true
             startStreaming()
+
             b.setText("End streaming")
             b.setBackgroundColor(resources.getColor(android.R.color.holo_red_light))
         }
@@ -100,15 +102,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startStreaming() {
+        val statusView = findViewById<TextView>(R.id.statusView)
         val serviceIntent = Intent().apply {
             putExtra("addr", addr)
             putExtra("port", port)
         }
         JobIntentService.enqueueWork(this, MicStreamService::class.java, 0, serviceIntent)
+        statusView.setText("Streaming to " + addr + ":" + port)
     }
 
     private fun stopStreaming() {
         MicStreamService.isStreaming = false
+        val statusView = findViewById<TextView>(R.id.statusView)
+        statusView.setText("")
     }
 
     override fun onRequestPermissionsResult(
