@@ -33,13 +33,13 @@ class MicStreamService : JobIntentService() {
         val minBufSizeInBytes = AudioRecord.getMinBufferSize(SAMPLE_RATE,
                 AudioFormat.CHANNEL_IN_MONO,
                 AudioFormat.ENCODING_PCM_16BIT)
-        val bufSizeInBytes = minBufSizeInBytes
-        val buffer = ShortArray(bufSizeInBytes)
+        val bufSizeInBytes = 2*minBufSizeInBytes
+        val buffer = ByteArray(bufSizeInBytes) //ShortArray(bufSizeInBytes)
         Log.d(LOG_TAG, "min_buf_size: "+ minBufSizeInBytes)
         val mic = AudioRecord(MediaRecorder.AudioSource.MIC,
                 SAMPLE_RATE,
                 AudioFormat.CHANNEL_IN_MONO,
-                AudioFormat.ENCODING_PCM_16BIT,
+                AudioFormat.ENCODING_PCM_8BIT,
                 bufSizeInBytes)
         mic.startRecording();
         while (isStreaming) {
@@ -48,7 +48,7 @@ class MicStreamService : JobIntentService() {
                 toRead -= mic.read(buffer, buffer.size - toRead, toRead);
             }
 
-            val packet = DatagramPacket(buf, buf.size, serverAddr, port)
+            val packet = DatagramPacket(buffer, buffer.size, serverAddr, port)
             udpSocket.send(packet)
         }
 
