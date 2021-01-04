@@ -39,7 +39,7 @@ class MicStreamService : JobIntentService() {
         val mic = AudioRecord(MediaRecorder.AudioSource.MIC,
                 SAMPLE_RATE,
                 AudioFormat.CHANNEL_IN_MONO,
-                AudioFormat.ENCODING_PCM_8BIT,
+                AudioFormat.ENCODING_PCM_16BIT,
                 bufSizeInBytes)
         mic.startRecording();
         while (isStreaming) {
