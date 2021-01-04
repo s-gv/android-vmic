@@ -19,6 +19,8 @@ import androidx.core.app.JobIntentService
 const val LOG_TAG = "LOG_vMic"
 private const val REQUEST_RECORD_AUDIO_PERMISSION = 200
 private const val SHARED_PREFERENCES_FILE = "com.sagargv.vmic.shared_prefs"
+private const val DEFAULT_ADDR = "192.168.29.236"
+private const val DEFAULT_PORT = 9009
 
 class MainActivity : AppCompatActivity() {
     var addr = ""
@@ -34,14 +36,28 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val sharedPref = getSharedPreferences(SHARED_PREFERENCES_FILE, MODE_PRIVATE)
-        addr = sharedPref.getString("addr", "192.168.29.236")!!
-        port = sharedPref.getInt("port", 9009)
+        addr = sharedPref.getString("addr", DEFAULT_ADDR)!!
+        port = sharedPref.getInt("port", DEFAULT_PORT)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         val inflater: MenuInflater = menuInflater
         inflater.inflate(R.menu.main_menu, menu)
         return true
+    }
+
+    override fun onSaveInstanceState(savedInstanceState: Bundle) {
+        super.onSaveInstanceState(savedInstanceState)
+        savedInstanceState.putString("addr", addr)
+        savedInstanceState.putInt("port", port)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        addr = savedInstanceState.getString("addr", DEFAULT_ADDR)
+        port = savedInstanceState.getInt("port", DEFAULT_PORT)
+        isStreaming = MicStreamService.isStreaming
+        updateUI()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -52,6 +68,25 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    fun updateUI() {
+        if (isStreaming) {
+            val b = findViewById(R.id.button) as Button
+            b.setText("End streaming")
+            b.setBackgroundColor(resources.getColor(android.R.color.holo_red_light))
+
+            val statusView = findViewById<TextView>(R.id.statusView)
+            statusView.setText("Streaming to " + addr + ":" + port)
+        }
+        else {
+            val b = findViewById(R.id.button) as Button
+            b.setText("Start mic streaming")
+            b.setBackgroundColor(resources.getColor(android.R.color.holo_green_light))
+
+            val statusView = findViewById<TextView>(R.id.statusView)
+            statusView.setText("")
         }
     }
 
@@ -103,32 +138,18 @@ class MainActivity : AppCompatActivity() {
 
     private fun startStreaming() {
         isStreaming = true
-
         val serviceIntent = Intent().apply {
             putExtra("addr", addr)
             putExtra("port", port)
         }
         JobIntentService.enqueueWork(this, MicStreamService::class.java, 0, serviceIntent)
-
-        val b = findViewById(R.id.button) as Button
-        b.setText("End streaming")
-        b.setBackgroundColor(resources.getColor(android.R.color.holo_red_light))
-
-        val statusView = findViewById<TextView>(R.id.statusView)
-        statusView.setText("Streaming to " + addr + ":" + port)
+        updateUI()
     }
 
     private fun stopStreaming() {
         isStreaming = false
-
         MicStreamService.isStreaming = false
-
-        val b = findViewById(R.id.button) as Button
-        b.setText("Start mic streaming")
-        b.setBackgroundColor(resources.getColor(android.R.color.holo_green_light))
-
-        val statusView = findViewById<TextView>(R.id.statusView)
-        statusView.setText("")
+        updateUI()
     }
 
     override fun onRequestPermissionsResult(
