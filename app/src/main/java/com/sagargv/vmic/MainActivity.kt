@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity() {
         if (!isStreaming) {
             isStreaming = true
             startStreaming()
-            b.setText("End mic streaming")
+            b.setText("End streaming")
             b.setBackgroundColor(resources.getColor(android.R.color.holo_red_light))
         }
         else {
