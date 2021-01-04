@@ -5,7 +5,6 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.Button
 import android.widget.EditText
@@ -16,10 +15,11 @@ import androidx.core.app.JobIntentService
 
 private const val LOG_TAG = "vMic"
 private const val REQUEST_RECORD_AUDIO_PERMISSION = 200
+private const val SHARED_PREFERENCES_FILE = "com.sagargv.vmic.shared_prefs"
 
 class MainActivity : AppCompatActivity() {
-    var ip = "192.168.29.236"
-    var port = 9009
+    var addr = ""
+    var port = 0
 
     private var permissionToRecordAccepted = false
     private var permissions: Array<String> = arrayOf(Manifest.permission.RECORD_AUDIO)
@@ -29,6 +29,10 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        val sharedPref = getSharedPreferences(SHARED_PREFERENCES_FILE, MODE_PRIVATE)
+        addr = sharedPref.getString("addr", "192.168.29.236")!!
+        port = sharedPref.getInt("port", 9009)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -50,7 +54,7 @@ class MainActivity : AppCompatActivity() {
 
     fun showIPDialog() {
         val layout = LayoutInflater.from(this).inflate(R.layout.dialog_addr, null, false)
-        layout.findViewById<EditText>(R.id.ip).setText(ip)
+        layout.findViewById<EditText>(R.id.ip).setText(addr)
         layout.findViewById<EditText>(R.id.port).setText(port.toString())
 
         val builder = AlertDialog.Builder(this)
@@ -59,8 +63,15 @@ class MainActivity : AppCompatActivity() {
         builder.apply {
             setPositiveButton(android.R.string.ok,
                     DialogInterface.OnClickListener { dialog, id ->
-                        ip = layout.findViewById<EditText>(R.id.ip).text.toString()
+                        addr = layout.findViewById<EditText>(R.id.ip).text.toString()
                         port = layout.findViewById<EditText>(R.id.port).text.toString().toInt()
+
+                        val sharedPref = getSharedPreferences(SHARED_PREFERENCES_FILE, MODE_PRIVATE)
+                        with (sharedPref.edit()) {
+                            putString("addr", addr)
+                            putInt("port", port)
+                            apply()
+                        }
                         //Log.i(LOG_TAG, ip + ":" + port)
                     })
             setNegativeButton(android.R.string.cancel,
@@ -90,7 +101,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun startStreaming() {
         val serviceIntent = Intent().apply {
-            putExtra("addr", ip)
+            putExtra("addr", addr)
             putExtra("port", port)
         }
         JobIntentService.enqueueWork(this, MicStreamService::class.java, 0, serviceIntent)
