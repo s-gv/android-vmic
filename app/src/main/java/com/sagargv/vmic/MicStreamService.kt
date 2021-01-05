@@ -6,6 +6,7 @@ import android.media.AudioRecord
 import android.media.MediaRecorder
 import android.util.Log
 import androidx.core.app.JobIntentService
+import java.lang.Exception
 import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.net.InetAddress
@@ -53,9 +54,14 @@ class MicStreamService : JobIntentService() {
             while(toRead > 0) {
                 toRead -= mic.read(buffer, buffer.size - toRead, toRead);
             }
+            try {
+                val packet = DatagramPacket(buffer, buffer.size, serverAddr, port)
+                udpSocket.send(packet)
+            }
+            catch (e: Exception) {
 
-            val packet = DatagramPacket(buffer, buffer.size, serverAddr, port)
-            udpSocket.send(packet)
+            }
+
         }
 
         mic.stop();
