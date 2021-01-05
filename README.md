@@ -6,9 +6,9 @@ This turns your android phone into a virtual microphone that streams its microph
 Write raw PCM data to file from UDP packets
 -------------------------------------------
 
-Use netcat to listen on a port for UDP packets and write the raw PCM samples to a file:
+Use socat to listen on a port for UDP packets and write the raw PCM samples to a file:
 ```
-nc -l -u -p 9009 > rawdata.pcm
+socat udp4-listen:9009 - > rawdata.pcm
 ```
 
 
@@ -32,10 +32,10 @@ Create a virtual mic that gets raw PCM samples from a named pipe:
 pactl load-module module-pipe-source source_name=virtmic file=/home/sagar/Desktop/virtmic format=s16le rate=8000 channels=1
 ```
 
-Use netcat to stream samples got via UDP to the named pipe `virtmic`:
+Use socat to stream samples got via UDP to the named pipe `virtmic`:
 
 ```
-nc -l -u -p 9060 > /home/sagar/Desktop/virtmic
+socat udp4-listen:9009 - > /home/sagar/Desktop/virtmic
 ```
 
 To remove the virtual mic:
