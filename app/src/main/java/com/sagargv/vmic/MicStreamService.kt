@@ -12,6 +12,7 @@ import java.net.InetAddress
 
 
 private const val SAMPLE_RATE = 8000
+private const val MIN_BUF_SIZE = 1024
 
 class MicStreamService : JobIntentService() {
     companion object {
@@ -33,9 +34,14 @@ class MicStreamService : JobIntentService() {
         val minBufSizeInBytes = AudioRecord.getMinBufferSize(SAMPLE_RATE,
                 AudioFormat.CHANNEL_IN_MONO,
                 AudioFormat.ENCODING_PCM_16BIT)
-        val bufSizeInBytes = 2*minBufSizeInBytes
+        var bufSizeInBytes = 2*minBufSizeInBytes
+        if (bufSizeInBytes < MIN_BUF_SIZE) {
+            bufSizeInBytes = MIN_BUF_SIZE
+        }
+
         val buffer = ByteArray(bufSizeInBytes) //ShortArray(bufSizeInBytes)
         Log.d(LOG_TAG, "min_buf_size: "+ minBufSizeInBytes)
+
         val mic = AudioRecord(MediaRecorder.AudioSource.MIC,
                 SAMPLE_RATE,
                 AudioFormat.CHANNEL_IN_MONO,
