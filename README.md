@@ -8,7 +8,7 @@ Write raw PCM data to file from UDP packets
 
 Use socat to listen on a port for UDP packets and write the raw PCM samples to a file:
 ```
-socat udp4-listen:9009 - > rawdata.pcm
+socat udp4-listen:9009,reuseaddr,fork - > rawdata.pcm
 ```
 
 
@@ -35,7 +35,7 @@ pactl load-module module-pipe-source source_name=virtmic file=/home/sagar/Deskto
 Use socat to stream samples got via UDP to the named pipe `virtmic`:
 
 ```
-socat udp4-listen:9009 - > /home/sagar/Desktop/virtmic
+socat udp4-listen:9009,reuseaddr,fork - > /home/sagar/Desktop/virtmic
 ```
 
 To remove the virtual mic:
